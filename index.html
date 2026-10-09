@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>C Visualized: (c) RMS</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--tx:#1d2330;--mu:#5b6475;--ac:#0f6e56;--ac2:#d85a30;--bd:#d9d6cc;--hl:#e1f5ee;--cd:#14202b;--ct:#d6e2ea;--ch:#1f4d46;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1a2029;--tx:#e8ecf2;--mu:#9aa5b5;--ac:#3fc59a;--ac2:#f08a63;--bd:#2c3542;--hl:#17382f;--cd:#0d1218;--ch:#1f4d46}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1a2029;--tx:#e8ecf2;--mu:#9aa5b5;--ac:#3fc59a;--ac2:#f08a63;--bd:#2c3542;--hl:#17382f;--cd:#0d1218;--ch:#1f4d46}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:1100px;margin:auto}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--mu);margin:0 0 14px;font-size:15px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{font:600 15px system-ui;padding:8px 16px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;cursor:pointer}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:12px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.pane{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;min-width:0}
+.code{background:var(--cd);color:var(--ct);font:14px/1.7 ui-monospace,Menlo,Consolas,monospace;border-radius:8px;padding:10px 0;overflow-x:auto}
+.code div{padding:0 12px;white-space:pre;border-left:3px solid transparent;opacity:.55}
+.code div.on{background:var(--ch);border-left-color:var(--ac);opacity:1;color:#fff}
+.vis{min-height:250px;overflow-x:auto}
+.lab{font-size:13px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.cell{border:2px solid var(--ac);border-radius:8px;padding:4px 10px;text-align:center;min-width:86px;background:var(--card)}
+.cell small{display:block;color:var(--mu);font:12px ui-monospace,monospace}.cell b{font-size:20px;display:block}.cell em{font-size:13px;color:var(--ac);font-style:normal}
+.tg{display:flex;flex-direction:column;align-items:center}.tg>span{font-size:13px;font-weight:700;color:var(--ac2);animation:bob 1s infinite}
+.new{animation:pop .5s}.flash{animation:fl .9s}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes fl{0%,100%{background:var(--card)}40%{background:var(--ac2);color:#fff}}
+@keyframes bob{50%{transform:translateY(4px)}}
+.st{display:flex;border:2px solid var(--ac);border-radius:8px;overflow:hidden;min-width:420px}
+.fd{padding:6px 8px;border-right:2px dashed var(--bd);text-align:center;min-width:0}.fd:last-child{border:0}
+.fd small{display:block;font:12px ui-monospace,monospace;color:var(--mu)}.fd b{font-size:18px;display:block;min-height:27px}.fd em{font-size:13px;color:var(--ac);font-style:normal}
+.dim{opacity:.4}.byte{width:74px;text-align:center;border:2px solid var(--ac2);border-radius:8px;padding:4px;background:var(--card)}
+.byte b{font:700 19px ui-monospace,monospace;display:block}.byte small{font:12px ui-monospace,monospace;color:var(--mu)}
+.vw{padding:5px 10px;border:1px solid var(--bd);border-radius:6px;margin-top:6px;font:14px ui-monospace,monospace;opacity:.6}.vw.on{opacity:1;background:var(--hl);border-color:var(--ac);font-weight:700}
+.ch{width:46px;height:46px;border:2px solid var(--ac);border-radius:6px;display:grid;place-items:center;font:700 18px ui-monospace,monospace;position:relative}
+.ch.ram{border-style:dashed;border-color:var(--ac2)}.cur{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);color:var(--ac2);font-size:14px}
+.cap{margin-top:12px;padding:10px 12px;background:var(--hl);border-radius:8px;min-height:60px}
+.ctl{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.ctl button{font:600 15px system-ui;padding:7px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.ctl button.p{background:var(--ac);color:#fff;border-color:var(--ac)}.ctl span{color:var(--mu);font-size:14px;margin-left:auto}
+.foot{color:var(--mu);font-size:13px;margin-top:14px;text-align:center}
+.out{background:var(--cd);color:var(--ct);font:15px ui-monospace,monospace;padding:6px 10px;border-radius:6px;min-height:32px}
+.fr{border:2px solid var(--ac);border-radius:8px;padding:6px 10px;margin-bottom:8px}.fr>b{display:block;color:var(--ac);margin-bottom:4px}
+</style></head><body>
+<h1>C Visualized: Designed by Prof. Rahul M. Samant</h1>
+<p class="sub">Pick a topic, then press Next (or Play). The highlighted line of code drives what happens in memory.</p>
+<div class="tabs" id="tabs"></div>
+<div class="grid"><div class="pane"><div class="code" id="code"></div>
+<div class="cap" id="cap"></div>
+<div class="ctl"><button id="pv">&#9664; Prev</button><button class="p" id="nx">Next &#9654;</button><button id="pl">&#9654;&#9654; Play</button><button id="rs">Reset</button><span id="ct"></span></div></div>
+<div class="pane vis" id="vis"></div></div>
+<div class="foot">Prof. Rahul M. Samant &middot; Fundamentals of Computer Programming (C)</div>
+<script>
+const C=(a,v,n,k='')=>`<div class="cell ${k}"><small>${a}</small><b>${v}</b><em>${n}</em></div>`;
+const T=(t,c)=>`<div class="tg"><span>${t}</span>${c}</div>`;
+const R=(t,...c)=>`<div class="lab">${t}</div><div class="row">${c.join('')}</div>`;
+const A=(t,k)=>R('Array a[3]',...[5,6,7].map((v,i)=>{const c=C(3000+4*i,v,'a['+i+']',k||'');return i===t?T('&#9660; p',c):c}));
+const X=(v,t,k)=>{const c=C(1000,v,'x',k||'');return t?T('&#9660; p',c):c};
+const P={code:['int x = 10;','int *p = &x;','*p = 25;','int a[3] = {5, 6, 7};','p = a;','p++;'],steps:[
+{l:0,c:'<b>int x = 10;</b> reserves 4 bytes (say at address 1000) and stores 10 there.',h:R('Memory',X(10,0,'new'))},
+{l:1,c:'<b>p</b> is also a variable. It stores the <b>address</b> of x (<code>&amp;x</code> = 1000).',h:R('Memory',X(10,1),C(2000,1000,'p (int*)','new'))},
+{l:2,c:'<b>*p</b> means &ldquo;go to the address held in p&rdquo;. Assigning through it changes <b>x</b> itself.',h:R('Memory',X(25,1,'flash'),C(2000,1000,'p (int*)'))},
+{l:3,c:'An array sits in consecutive memory; each int is 4 bytes after the previous one.',h:R('Memory',X(25,0),C(2000,1000,'p'))+A(-1,'new')},
+{l:4,c:'<b>p = a</b> stores the address of a[0] (the array name decays to a pointer).',h:R('Memory',X(25,0),C(2000,3000,'p','flash'))+A(0)},
+{l:5,c:'<b>p++</b> adds <code>sizeof(int)</code> = 4 bytes, not 1. p now points to a[1], so <code>*p</code> is 6.',h:R('Memory',X(25,0),C(2000,3004,'p','flash'))+A(1)}]};
+const S0=['struct Student {','  int roll; float cgpa; char name[8];','};','struct Student s;','s.roll = 21;','s.cgpa = 8.5;','strcpy(s.name, "Asha");','struct Student *ps = &s;','ps->cgpa = 9.1;'];
+const F=(l,o,v,f,k)=>`<div class="fd ${k||''}" style="flex:${f}"><small>+${o}</small><b>${v}</b><em>${l}</em></div>`;
+const SV=(a,r,g,n,k,ps)=>`<div class="lab">${a}</div><div class="st">${F('int roll',0,r,4,k==1?'flash':'')}${F('float cgpa',4,g,4,k==2?'flash':'')}${F('char name[8]',8,n,8,k==3?'flash':'')}</div>`+(ps?`<div class="lab">Pointer</div><div class="row">${C(2000,'&amp;s','ps','new')}</div>`:'');
+const ST={code:S0,steps:[
+{l:0,c:'A <b>struct</b> definition is only a blueprint. No memory is allocated yet.',h:`<div class="st dim"><div class="fd" style="flex:4"><small>int</small><em>roll</em></div><div class="fd" style="flex:4"><small>float</small><em>cgpa</em></div><div class="fd" style="flex:8"><small>char[8]</small><em>name</em></div></div>`},
+{l:3,c:'<b>struct Student s;</b> allocates 16 bytes (4 + 4 + 8) as one block. Members sit one after another at fixed offsets.',h:SV('s  (16 bytes at 1000)','?','?','?',0)},
+{l:4,c:'The <b>dot operator</b> reaches a member of a struct variable.',h:SV('s','21','?','?',1)},
+{l:5,c:'Different member types live side by side. Each has its own storage.',h:SV('s','21','8.5','?',2)},
+{l:6,c:'A char array member is filled with <code>strcpy</code>, not <code>=</code>.',h:SV('s','21','8.5','"Asha"',3)},
+{l:7,c:'<b>ps</b> holds the address of the whole struct.',h:SV('s','21','8.5','"Asha"',0,1)},
+{l:8,c:'Through a pointer use the <b>arrow</b>: <code>ps-&gt;cgpa</code> is the same as <code>(*ps).cgpa</code>.',h:SV('s','21','9.1','"Asha"',2,1)}]};
+const BY=(b,hot)=>`<div class="lab">Shared memory: 4 bytes at 1000</div><div class="row">${b.map((x,i)=>`<div class="byte ${hot?'flash':''}"><small>${1000+i}</small><b>${x}</b></div>`).join('')}</div>`;
+const V=(i,f,c,on)=>`<div class="lab">Same bytes, three views</div><div class="vw ${on==0?'on':''}">d.i = ${i}</div><div class="vw ${on==1?'on':''}">d.f = ${f}</div><div class="vw ${on==2?'on':''}">d.c = ${c}</div>`;
+const U={code:['union Data {','  int i; float f; char c[4];','};','union Data d;','d.i = 65;','d.f = 3.14f;','d.c[0] = \'A\';'],steps:[
+{l:0,c:'In a <b>union</b> all members start at the <b>same address</b>. Size = largest member = 4 bytes (a struct of these would be 12).',h:BY(['??','??','??','??'])+V('?','?','?',-1)},
+{l:3,c:'Only 4 bytes are reserved. Only <b>one member is meaningful</b> at a time.',h:BY(['??','??','??','??'])+V('?','?','?',-1)},
+{l:4,c:'Storing 65 in <b>i</b> sets the bytes (little-endian: lowest byte first). Reading c[0] would give &lsquo;A&rsquo;.',h:BY(['41','00','00','00'],1)+V('65','9.1e-44 (garbage)',"'A', 0, 0, 0",0)},
+{l:5,c:'Writing <b>f</b> overwrites the same 4 bytes with the IEEE-754 pattern of 3.14. The old int is lost; reading <b>i</b> now gives a meaningless number.',h:BY(['C3','F5','48','40'],1)+V('1078523331','3.14',"0xC3, 0xF5, 'H', '@'",1)},
+{l:6,c:'Changing just <b>c[0]</b> alters only byte 0. Both i and f change as a side effect, because they share it.',h:BY(['41','F5','48','40'],1)+V('1078523201','&asymp; 3.139',"'A', 0xF5, 'H', '@'",2)}]};
+const ch=(s,k,cur)=>s.split('').map((x,i)=>`<div class="ch ${k}">${x=='\n'?'&crarr;':x==' '?'&middot;':x}${cur===i?'<span class="cur">&#9650;</span>':''}</div>`).join('');
+const FV=(file,k,cur,fp,buf)=>`<div class="lab">Disk file: a.txt</div><div class="row" style="padding-bottom:22px">${file?ch(file,k,cur)+(cur===file.length?'<div class="ch" style="border-style:none;position:relative"><span class="cur">&#9650;</span>EOF</div>':''):'<div class="vw on">(empty)</div>'}</div><div class="lab">FILE *fp</div><div class="vw on">${fp}</div><div class="lab">Program variable buf</div><div class="vw on">${buf}</div>`;
+const FH={code:['FILE *fp = fopen("a.txt", "w");','fprintf(fp, "Hi C\\n");','fclose(fp);','fp = fopen("a.txt", "r");','fgets(buf, 20, fp);','fclose(fp);'],steps:[
+{l:0,c:'<b>fopen</b> in <b>"w"</b> mode creates the file (or empties an existing one) and returns a FILE pointer. Always check it is not NULL.',h:FV('','',0,'open for writing, position 0','(unused)')},
+{l:1,c:'<b>fprintf</b> works like printf, but into the file. Data first goes to a <b>RAM buffer</b> (dashed), not yet on disk.',h:FV('Hi C\n','ram',-1,'open for writing, buffered 5 chars','(unused)')},
+{l:2,c:'<b>fclose</b> flushes the buffer to disk and releases the file. Forgetting it can lose data.',h:FV('Hi C\n','',-1,'closed','(unused)')},
+{l:3,c:'Reopen in <b>"r"</b> mode. The read position starts at the first character.',h:FV('Hi C\n','',0,'open for reading, position 0','(unused)')},
+{l:4,c:'<b>fgets</b> reads up to the newline (or 19 chars). The position moves forward to the end of what was read.',h:FV('Hi C\n','',5,'open for reading, position 5','"Hi C\\n"')},
+{l:5,c:'Close again. Rule of thumb: every successful <b>fopen</b> needs a matching <b>fclose</b>. Other modes: "a" append, "rb"/"wb" binary.',h:FV('Hi C\n','',-1,'closed','"Hi C\\n"')}]};
+const E=(...r)=>`<div class="lab">Evaluation</div>`+r.map(x=>`<div class="vw on">${x}</div>`).join('');
+const VAR=(...c)=>R('Variables',...c);
+const O={code:['int a = 7, b = 2;','int s = a + b, q = a / b, m = a % b;','float r = (float)a / b;','int t = (a > b) && (b > 0);','int g = a & b, h = a << 1;','int c = a++, d = ++a;'],steps:[
+{l:0,c:'Two int variables. Each operator below works on these values.',h:VAR(C(1000,7,'a','new'),C(1004,2,'b','new'))},
+{l:1,c:'<b>/</b> on two ints is <b>integer division</b>: the fraction is dropped. <b>%</b> gives the remainder.',h:VAR(C(1000,7,'a'),C(1004,2,'b'))+E('a + b = 9','a / b = 3 (not 3.5)','a % b = 1')},
+{l:2,c:'A <b>cast</b> converts a to float <i>before</i> the division, so the result keeps its fraction.',h:VAR(C(1000,7,'a'),C(1004,2,'b'))+E('(float)a = 7.0','7.0 / 2 = 3.5')},
+{l:3,c:'Relational operators give 1 (true) or 0 (false). C has no bool here: 0 is false, anything else is true.',h:VAR(C(1000,7,'a'),C(1004,2,'b'))+E('a &gt; b is 1','b &gt; 0 is 1','1 &amp;&amp; 1 is 1')},
+{l:4,c:'<b>Bitwise</b> operators work on each bit. <b>&lt;&lt;</b> shifts left, which doubles the value.',h:VAR(C(1000,7,'a'),C(1004,2,'b'))+E('a = 0111','b = 0010','a &amp; b = 0010 = 2','a &lt;&lt; 1 = 1110 = 14')},
+{l:5,c:'<b>a++</b> uses the old value, then increments. <b>++a</b> increments first, then uses the new value.',h:VAR(C(1000,9,'a','flash'),C(1008,7,'c'),C(1012,9,'d'))+E('c = a++ : use 7, then a becomes 8','d = ++a : a becomes 9, then use 9')}]};
+const LP=(i,s,ph,out,k)=>VAR(C(1000,i,'i',k=='i'?'flash':''),C(1004,s,'sum',k=='s'?'flash':''))+`<div class="lab">Loop phase</div><div class="row">${['init','condition','body','update'].map((x,n)=>`<div class="vw ${n==ph?'on':''}" style="margin:0">${x}</div>`).join('')}</div><div class="lab">Console</div><div class="out">${out||'&nbsp;'}</div>`;
+const LO={code:['int sum = 0;','for (int i = 1; i <= 3; i++) {','    sum += i;','}','printf("%d", sum);'],steps:[
+{l:0,c:'sum starts at 0 and will collect the total.',h:LP('?',0,-1,'')},
+{l:1,c:'<b>Init</b> runs once: i = 1.',h:LP(1,0,0,'')},
+{l:1,c:'<b>Condition</b> 1 &lt;= 3 is true, so the body runs.',h:LP(1,0,1,'')},
+{l:2,c:'<b>Body</b>: sum = 0 + 1 = 1.',h:LP(1,1,2,'','s')},
+{l:1,c:'<b>Update</b> i++ makes i = 2. Condition 2 &lt;= 3 is true.',h:LP(2,1,3,'','i')},
+{l:2,c:'Body: sum = 1 + 2 = 3.',h:LP(2,3,2,'','s')},
+{l:1,c:'Update: i = 3. Condition 3 &lt;= 3 is still true.',h:LP(3,3,3,'','i')},
+{l:2,c:'Body: sum = 3 + 3 = 6.',h:LP(3,6,2,'','s')},
+{l:1,c:'Update: i = 4. Condition 4 &lt;= 3 is <b>false</b>, so the loop ends.',h:LP(4,6,1,'','i')},
+{l:4,c:'Prints 6. <b>while</b> tests the condition first; <b>do-while</b> runs the body once before testing.',h:LP(4,6,-1,'6')}]};
+const AR=(v,i,m,k)=>R('int a[5]  (base address 1000)',...v.map((x,j)=>{const c=C(1000+4*j,x,'a['+j+']',k===j?'flash':'');return j===i?T('&#9660; i',c):c}))+(m===undefined?'':R('Variables',C(2000,m,'max',k=='m'?'flash':'')));
+const V2=[4,9,20,7,1];
+const AY={code:['int a[5] = {4, 9, 2, 7, 1};','a[2] = 20;','int max = a[0];','for (int i = 1; i < 5; i++)','    if (a[i] > max) max = a[i];'],steps:[
+{l:0,c:'An array is <b>consecutive</b> memory of one type. Indexes start at <b>0</b>, and each int is 4 bytes after the last.',h:AR([4,9,2,7,1],-1,undefined,-1)},
+{l:1,c:'Assign to one element by its index. Valid indexes are 0 to 4; a[5] would be out of bounds.',h:AR(V2,-1,undefined,2)},
+{l:2,c:'Assume the first element is the maximum.',h:AR(V2,0,4,'m')},
+{l:4,c:'i = 1: a[1] = 9 &gt; 4, so max becomes 9.',h:AR(V2,1,9,'m')},
+{l:4,c:'i = 2: a[2] = 20 &gt; 9, so max becomes 20.',h:AR(V2,2,20,'m')},
+{l:4,c:'i = 3: 7 &gt; 20 is false. max is unchanged.',h:AR(V2,3,20,-1)},
+{l:4,c:'i = 4: 1 &gt; 20 is false. Done: max = 20. Note <code>a[i]</code> is the same as <code>*(a + i)</code>.',h:AR(V2,4,20,-1)}]};
+const FR=(n,v,k)=>`<div class="fr ${k||''}"><b>${n}</b><div class="row">${v}</div></div>`;
+const FN=(...f)=>`<div class="lab">Call stack (top first)</div>`+f.join('');
+const MN=(x,y,k)=>FR('main()',C(1000,x,'x')+C(1004,y,'y',k||''));
+const FU={code:['int square(int n) {','    return n * n;','}','int main() {','    int x = 4;','    int y = square(x);','}'],steps:[
+{l:3,c:'Execution starts in <b>main</b>. It gets a stack frame holding its local variables.',h:FN(FR('main()',C(1000,'?','x')+C(1004,'?','y'),'new'))},
+{l:4,c:'x is set to 4 inside main\'s frame.',h:FN(MN(4,'?'))},
+{l:5,c:'<b>Call</b>: a new frame is pushed. Parameter <b>n</b> is a <b>copy</b> of x (pass by value).',h:FN(FR('square(n)',C(2000,4,'n','new')+'<div class="vw on" style="margin:0">returns to line 6</div>'),MN(4,'?'))},
+{l:1,c:'The function computes n * n = 16 and prepares to return it.',h:FN(FR('square(n)',C(2000,4,'n')+'<div class="vw on" style="margin:0">return 16</div>'),MN(4,'?'))},
+{l:5,c:'<b>Return</b>: the square frame is popped and 16 is stored in y.',h:FN(MN(4,16,'flash'))},
+{l:6,c:'Changing n inside square would not change x. To modify the caller\'s variable, pass its address (<code>&amp;x</code>) to a pointer parameter.',h:FN(MN(4,16))}]};
+const TOP={Operators:O,Loops:LO,Arrays:AY,Functions:FU,Pointers:P,Structures:ST,Unions:U,'File Handling':FH};
+let cur='Operators',i=0,tm=null;
+const $=id=>document.getElementById(id);
+function stop(){clearInterval(tm);tm=null;$('pl').innerHTML='&#9654;&#9654; Play'}
+function draw(){const t=TOP[cur],s=t.steps[i];
+$('code').innerHTML='';t.code.forEach((x,n)=>{const d=document.createElement('div');d.textContent=x||' ';if(n===s.l)d.className='on';$('code').appendChild(d)});
+$('cap').innerHTML=s.c;$('vis').innerHTML=s.h;$('ct').textContent='Step '+(i+1)+' of '+t.steps.length;
+$('pv').disabled=i==0;$('nx').disabled=i==t.steps.length-1}
+function go(n){i=Math.max(0,Math.min(TOP[cur].steps.length-1,n));draw();if(i==TOP[cur].steps.length-1)stop()}
+$('nx').onclick=()=>{stop();go(i+1)};$('pv').onclick=()=>{stop();go(i-1)};
+$('rs').onclick=()=>{stop();go(0)};
+$('pl').onclick=()=>{if(tm)return stop();if(i==TOP[cur].steps.length-1)go(0);$('pl').innerHTML='&#10074;&#10074; Pause';tm=setInterval(()=>go(i+1),2200)};
+Object.keys(TOP).forEach(k=>{const b=document.createElement('button');b.textContent=k;b.onclick=()=>{stop();cur=k;i=0;[...$('tabs').children].forEach(x=>x.classList.toggle('on',x===b));draw()};if(k==cur)b.className='on';$('tabs').appendChild(b)});
+draw();
+</script></body></html>
