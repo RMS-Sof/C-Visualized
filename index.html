@@ -65,7 +65,7 @@ const P={code:['int x = 10;','int *p = &x;','*p = 25;','int a[3] = {5, 6, 7};','
 {l:3,c:'An array sits in consecutive memory; each int is 4 bytes after the previous one.',h:R('Memory',X(25,0),C(2000,1000,'p'))+A(-1,'new')},
 {l:4,c:'<b>p = a</b> stores the address of a[0] (the array name decays to a pointer).',h:R('Memory',X(25,0),C(2000,3000,'p','flash'))+A(0)},
 {l:5,c:'<b>p++</b> adds <code>sizeof(int)</code> = 4 bytes, not 1. p now points to a[1], so <code>*p</code> is 6.',h:R('Memory',X(25,0),C(2000,3004,'p','flash'))+A(1)}]};
-const S0=['struct Student {','  int roll; float cgpa; char name[8];','};','struct Student s;','s.roll = 21;','s.cgpa = 8.5;','strcpy(s.name, "Asha");','struct Student *ps = &s;','ps->cgpa = 9.1;'];
+const S0=['struct Student {','  int roll; float cgpa; char name[8];','};','struct Student s;','s.roll = 21;','s.cgpa = 8.5;','strcpy(s.name, "Shashank");','struct Student *ps = &s;','ps->cgpa = 9.1;'];
 const F=(l,o,v,f,k)=>`<div class="fd ${k||''}" style="flex:${f}"><small>+${o}</small><b>${v}</b><em>${l}</em></div>`;
 const SV=(a,r,g,n,k,ps)=>`<div class="lab">${a}</div><div class="st">${F('int roll',0,r,4,k==1?'flash':'')}${F('float cgpa',4,g,4,k==2?'flash':'')}${F('char name[8]',8,n,8,k==3?'flash':'')}</div>`+(ps?`<div class="lab">Pointer</div><div class="row">${C(2000,'&amp;s','ps','new')}</div>`:'');
 const ST={code:S0,steps:[
@@ -73,7 +73,7 @@ const ST={code:S0,steps:[
 {l:3,c:'<b>struct Student s;</b> allocates 16 bytes (4 + 4 + 8) as one block. Members sit one after another at fixed offsets.',h:SV('s  (16 bytes at 1000)','?','?','?',0)},
 {l:4,c:'The <b>dot operator</b> reaches a member of a struct variable.',h:SV('s','21','?','?',1)},
 {l:5,c:'Different member types live side by side. Each has its own storage.',h:SV('s','21','8.5','?',2)},
-{l:6,c:'A char array member is filled with <code>strcpy</code>, not <code>=</code>.',h:SV('s','21','8.5','"Asha"',3)},
+{l:6,c:'A char array member is filled with <code>strcpy</code>, not <code>=</code>.',h:SV('s','21','8.5','"Shashank"',3)},
 {l:7,c:'<b>ps</b> holds the address of the whole struct.',h:SV('s','21','8.5','"Asha"',0,1)},
 {l:8,c:'Through a pointer use the <b>arrow</b>: <code>ps-&gt;cgpa</code> is the same as <code>(*ps).cgpa</code>.',h:SV('s','21','9.1','"Asha"',2,1)}]};
 const BY=(b,hot)=>`<div class="lab">Shared memory: 4 bytes at 1000</div><div class="row">${b.map((x,i)=>`<div class="byte ${hot?'flash':''}"><small>${1000+i}</small><b>${x}</b></div>`).join('')}</div>`;
